@@ -7,10 +7,11 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db, Student
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from sqlalchemy import desc
 
 #from models import Person
 
@@ -62,6 +63,36 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0 # avoid cache memory
     return response
+
+
+@app.route('/student', methods=['GET'])
+def get_student():
+    students = Student.query.all()
+    #all_students = list(map(lambda x: x.serialize(), student))
+    student_data = [{'name_student': student.name_student, 'email': student.email} for student in students]
+    return jsonify(student_data), 200
+
+@app.route('/student/alto', methods=['GET'])
+def get_student_alto_id():
+    #students = Student.query.all()
+    student = Student.query.order_by(desc(Student.id)).first()
+    student_data = {'id': student.id, 'name_student': student.name_student}
+    return jsonify(student_data), 200
+
+@app.route('/student/check', methods=['GET'])
+def get_student_check():
+    students = Student.query.filter_by(programming_skills=True).all()
+    student_data = [student.serialize() for student in students]
+    return jsonify(student_data), 200
+
+@app.route('/student', methods=['POST'])
+def add_student():
+
+    request_body = request.get_json()  
+    new_student = Student(name_student=request_body['name_student'], email=request_body['email'], programming_skills=request_body['programming_skills'])
+    db.session.add(new_student)
+    db.session.commit()
+    return jsonify('student added:',new_student.serialize()), 200
 
 
 # this only runs if `$ python src/main.py` is executed

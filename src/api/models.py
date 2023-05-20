@@ -63,6 +63,11 @@ class Submission(db.Model):
         return f'Submission: {self.student.name_student} / {self.submited_date }'
 
     def serialize(self):
+        # Retorna None si ya existe una entrada con los mismos valores
+        #existing_submission = Submission.query.filter_by(project_id=self.project_id, student_id=self.student_id).first()
+        #if existing_submission:
+            #return None  
+        
         return {
             "project_id": self.project_id,
             "student_id": self.student_id,

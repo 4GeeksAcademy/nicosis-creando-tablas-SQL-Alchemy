@@ -65,13 +65,14 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0 # avoid cache memory
     return response
 
-# Insertar estudiante en la tabla con funcion
+# 1.2 Insertar estudiante en la tabla con funcion
 def create_student():
-    student = Student(name_student="Papi", email="papi@gmail.es", programming_skills=True) 
+    student = Student(name_student="Choto", email="choto@gmail.es", programming_skills=True) 
     # encolo el producto que quiero crear en base de datos
     db.session.add(student)
     # Confirmo los cambios para que haga los INSERT
     db.session.commit()
+    print('estudiante agregado:', student)
 
 # 1.2 Insertar Student
 @app.route('/student', methods=['POST'])
@@ -173,10 +174,10 @@ def get_project_before_date2(date):
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
-    #app.run(host='0.0.0.0', port=PORT, debug=True)
+    app.run(host='0.0.0.0', port=PORT, debug=True)
 
     # Lo necesitamos para pdoer ejecutar código Python normal fuera del entorno de Flask
-    with app.app_context():
+    #with app.app_context():
         #Iteración 1.2
         #create_student()
         #Iteración 1.3
@@ -194,7 +195,7 @@ if __name__ == '__main__':
         #Iteración 3.1
         #delivered_project(1,1,datetime(2023,5,20))
         #Iteración 3.2
-        #get_project_by_student_id(1)
+        #get_project_by_student_id(4)
         #Iteración 3.3
         #get_project_before_date2(datetime(2023, 5, 7))
         #get_project_before_date(datetime(2023, 5, 7))

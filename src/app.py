@@ -65,6 +65,14 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0 # avoid cache memory
     return response
 
+# Insertar estudiante en la tabla con funcion
+def create_student():
+    student = Student(name_student="Papi", email="papi@gmail.es", programming_skills=True) 
+    # encolo el producto que quiero crear en base de datos
+    db.session.add(student)
+    # Confirmo los cambios para que haga los INSERT
+    db.session.commit()
+
 # 1.2 Insertar Student
 @app.route('/student', methods=['POST'])
 def add_student():
@@ -95,11 +103,16 @@ def get_student_alto_id():
 # 1.5 Recupera SOLAMENTE los estudiantes de la base de datos que SÍ tenian conocimientos previos de programación. Muestra su nombre y email. 
 @app.route('/student/check', methods=['GET'])
 def get_student_check():
-    students = Student.query.filter_by(programming_skills=True).all()
+    students = Student.query.filter(Student.programming_skills == True).all()
     student_data = [student.serialize() for student in students]
     print(student_data)
     return jsonify(student_data), 200
 
+# 2.0 Crear un nuevo proyecto en la tabla Project
+def create_project():
+    project = Project(project_name="Star Wars API", topics="JavaScript, Fetch, React")
+    db.session.add(project)
+    db.session.commit()
 
 # 2.1 Recupera todos los proyectos y muestralos por el terminal
 @app.route('/project', methods=['GET'])
@@ -123,6 +136,15 @@ def get_project_param(palabra):
     all_projects = [project.serialize() for project in projects]
     print(all_projects)
     return jsonify(all_projects), 200
+
+# 3.1 Estudiantes entregan proyectos
+def delivered_project(s_id, p_id, date):
+    # student_id es el nombre de la columna de submission
+    # s_id simplemente es el valor del parámetro de la función, abreviatura de student_id. Valdría igual sin abreviar (student_id = student_id) pero lo pongo así para acordarme de donde viene.
+    projects_done = Submission(student_id = s_id, project_id = p_id, submited_date=date) 
+    db.session.add(projects_done)
+    db.session.commit()
+    print(f'proyecto {projects_done} entregado')
 
 # 3.2 Recupera todos los proyectos entregados por Alexander  // <int:student_id>
 @app.route('/project/<int:student_id>', methods=['GET'])
@@ -151,22 +173,28 @@ def get_project_before_date2(date):
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
-    app.run(host='0.0.0.0', port=PORT, debug=True)
+    #app.run(host='0.0.0.0', port=PORT, debug=True)
 
     # Lo necesitamos para pdoer ejecutar código Python normal fuera del entorno de Flask
-    #with app.app_context():
+    with app.app_context():
+        #Iteración 1.2
+        #create_student()
         #Iteración 1.3
         #get_students()
         #Iteración 1.4
         #get_student_alto_id()
         #Iteración 1.5
         #get_student_check()
+        #Iteración 2.0
+        #create_project()
         #Iteración 2.1
         #get_projects()
         #Iteración 2.2
         #get_project_param("JavaScript")
+        #Iteración 3.1
+        #delivered_project(1,1,datetime(2023,5,20))
         #Iteración 3.2
-        #get_project_by_student_id(4)
+        #get_project_by_student_id(1)
         #Iteración 3.3
         #get_project_before_date2(datetime(2023, 5, 7))
         #get_project_before_date(datetime(2023, 5, 7))
